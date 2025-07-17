@@ -48,7 +48,7 @@ export default function LoginPage() {
           <div className="flex justify-center items-center mb-4">
             <Link href="/" className="flex items-center space-x-2">
                 <Hospital className="h-8 w-8 text-primary" />
-                <span className="text-2xl font-bold">MediLink</span>
+                <span className="text-2xl font-bold">StayHealthy</span>
             </Link>
           </div>
           <CardTitle>Welcome Back</CardTitle>

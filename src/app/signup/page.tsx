@@ -59,11 +59,11 @@ export default function SignUpPage() {
           <div className="flex justify-center items-center mb-4">
             <Link href="/" className="flex items-center space-x-2">
                 <Hospital className="h-8 w-8 text-primary" />
-                <span className="text-2xl font-bold">MediLink</span>
+                <span className="text-2xl font-bold">StayHealthy</span>
             </Link>
           </div>
           <CardTitle>Create an Account</CardTitle>
-          <CardDescription>Join MediLink to manage your health appointments.</CardDescription>
+          <CardDescription>Join StayHealthy to manage your health appointments.</CardDescription>
         </CardHeader>
         <form onSubmit={handleSignUp}>
           <CardContent className="space-y-4">

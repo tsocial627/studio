@@ -8,11 +8,11 @@ const Footer = () => {
         <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
           <Link href="/" className="flex items-center space-x-2">
             <Hospital className="h-6 w-6 text-primary" />
-            <p className="text-center text-sm leading-loose md:text-left font-bold">MediLink</p>
+            <p className="text-center text-sm leading-loose md:text-left font-bold">StayHealthy</p>
           </Link>
         </div>
         <p className="text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} MediLink Inc. All rights reserved.
+          © {new Date().getFullYear()} StayHealthy Inc. All rights reserved.
         </p>
       </div>
     </footer>

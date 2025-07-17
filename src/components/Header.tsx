@@ -21,7 +21,7 @@ const Header = () => {
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <Hospital className="h-6 w-6 text-primary" />
-          <span className="font-bold text-lg">MediLink</span>
+          <span className="font-bold text-lg">StayHealthy</span>
         </Link>
         
         {!isMobile && (
@@ -52,7 +52,7 @@ const Header = () => {
               <SheetContent side="right">
                 <Link href="/" className="mr-6 flex items-center space-x-2 mb-8">
                   <Hospital className="h-6 w-6 text-primary" />
-                  <span className="font-bold text-lg">MediLink</span>
+                  <span className="font-bold text-lg">StayHealthy</span>
                 </Link>
                 <nav className="grid gap-6 text-lg font-medium">
                   {navLinks.map((link) => (

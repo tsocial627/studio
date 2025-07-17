@@ -13,7 +13,7 @@ const Hero = () => {
                 Your Health, Your Schedule.
               </h1>
               <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                Connect with top doctors and specialists from the comfort of your home. MediLink makes healthcare accessible for everyone, everywhere.
+                Connect with top doctors and specialists from the comfort of your home. StayHealthy makes healthcare accessible for everyone, everywhere.
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
