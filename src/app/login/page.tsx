@@ -12,6 +12,7 @@ import {Hospital, Loader2} from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
