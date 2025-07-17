@@ -35,7 +35,12 @@ const Header = () => {
         )}
 
         <div className="flex flex-1 items-center justify-end space-x-2">
-          <Button>Sign Up</Button>
+          <Button variant="ghost" asChild>
+            <Link href="/login">Login</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/signup">Sign Up</Link>
+          </Button>
           {isMobile && (
             <Sheet>
               <SheetTrigger asChild>
