@@ -2,72 +2,18 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
-import { Star, Search, HeartPulse, Stethoscope, Brain, Bone, MessageSquare } from "lucide-react"
-import type { Doctor } from "@/lib/types"
+import { Search, MessageSquare } from "lucide-react"
 import { Button } from "./ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
+import { doctors } from "@/lib/data"
+import { StarRating } from "./StarRating"
 
-const doctors: Doctor[] = [
-  {
-    id: "1",
-    name: "Dr. Evelyn Reed",
-    specialty: "Cardiologist",
-    rating: 4.9,
-    reviews: 128,
-    image: "https://placehold.co/100x100.png",
-    bio: "Specializes in heart-related conditions and preventative care. Over 15 years of experience.",
-    icon: HeartPulse,
-  },
-  {
-    id: "2",
-    name: "Dr. Marcus Thorne",
-    specialty: "Neurologist",
-    rating: 4.8,
-    reviews: 94,
-    image: "https://placehold.co/100x100.png",
-    bio: "Expert in treating disorders of the nervous system, including stroke and epilepsy.",
-    icon: Brain,
-  },
-  {
-    id: "3",
-    name: "Dr. Anya Sharma",
-    specialty: "General Physician",
-    rating: 4.9,
-    reviews: 210,
-    image: "https://placehold.co/100x100.png",
-    bio: "Provides comprehensive primary care for patients of all ages. Your family's health partner.",
-    icon: Stethoscope,
-  },
-  {
-    id: "4",
-    name: "Dr. James Carter",
-    specialty: "Orthopedic Surgeon",
-    rating: 4.7,
-    reviews: 76,
-    image: "https://placehold.co/100x100.png",
-    bio: "Skilled in surgical and non-surgical treatment of musculoskeletal injuries.",
-    icon: Bone,
-  },
-];
-
-const StarRatingDisplay = ({ rating }: { rating: number }) => (
-    <div className="flex items-center">
-      {Array.from({ length: 5 }, (_, i) => (
-        <Star
-          key={i}
-          className={`h-4 w-4 ${
-            i < Math.floor(rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-          }`}
-        />
-      ))}
-    </div>
-);
 
 const FeedbackForm = ({ doctorName, onSubmit }: { doctorName: string; onSubmit: (feedback: { rating: number; comment: string }) => void }) => {
   const [rating, setRating] = useState(0);
@@ -91,17 +37,7 @@ const FeedbackForm = ({ doctorName, onSubmit }: { doctorName: string; onSubmit: 
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <p className="font-medium">Your rating for {doctorName}</p>
-        <div className="flex items-center">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <Star
-              key={star}
-              className={`h-6 w-6 cursor-pointer ${
-                star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-              }`}
-              onClick={() => setRating(star)}
-            />
-          ))}
-        </div>
+        <StarRating rating={rating} onRate={setRating} size={24} />
       </div>
       <div className="space-y-2">
         <label htmlFor="comment" className="font-medium">Your feedback</label>
@@ -202,7 +138,7 @@ const DoctorList = () => {
                         <CardContent className="text-center space-y-4 flex-grow flex flex-col justify-between">
                             <div>
                                 <div className="flex justify-center items-center gap-2">
-                                   <StarRatingDisplay rating={doctor.rating} />
+                                   <StarRating rating={doctor.rating} />
                                    <span className="text-sm text-muted-foreground">({doctor.reviews} reviews)</span>
                                 </div>
                                 <p className="text-sm text-muted-foreground mt-2">{doctor.bio}</p>
@@ -224,7 +160,7 @@ const DoctorList = () => {
                                     </DialogTrigger>
                                     <DialogContent>
                                         <DialogHeader>
-                                            <DialogTitle>Leave Feedback</DialogTitle>
+                                            <DialogTitle>Leave Feedback for {doctor.name}</DialogTitle>
                                         </DialogHeader>
                                         <FeedbackForm 
                                             doctorName={doctor.name} 

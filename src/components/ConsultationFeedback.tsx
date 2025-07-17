@@ -10,7 +10,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Star } from "lucide-react";
+import { StarRating } from "./StarRating";
+import { doctors } from "@/lib/data";
 
 const feedbackSchema = z.object({
   doctor: z.string().min(1, "Please select a doctor."),
@@ -20,29 +21,6 @@ const feedbackSchema = z.object({
 });
 
 type SubmittedFeedback = z.infer<typeof feedbackSchema>;
-
-const doctors = [
-  { id: "1", name: "Dr. Evelyn Reed" },
-  { id: "2", name: "Dr. Marcus Thorne" },
-  { id: "3", name: "Dr. Anya Sharma" },
-  { id: "4", name: "Dr. James Carter" },
-];
-
-const StarRatingInput = ({ value, onChange }: { value: number; onChange: (value: number) => void }) => {
-  return (
-    <div className="flex items-center">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={`h-6 w-6 cursor-pointer ${
-            star <= value ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-          }`}
-          onClick={() => onChange(star)}
-        />
-      ))}
-    </div>
-  );
-};
 
 const ConsultationFeedback = () => {
   const { toast } = useToast();
@@ -121,7 +99,7 @@ const ConsultationFeedback = () => {
                            <Controller
                             name="rating"
                             control={form.control}
-                            render={({ field }) => <StarRatingInput value={field.value} onChange={field.onChange} />}
+                            render={({ field }) => <StarRating rating={field.value} onRate={field.onChange} size={24} />}
                           />
                         </FormControl>
                         <FormMessage />
@@ -174,16 +152,7 @@ const ConsultationFeedback = () => {
                   <CardHeader>
                     <CardTitle className="flex justify-between items-center">
                       <span>{review.doctor}</span>
-                       <div className="flex items-center">
-                          {Array.from({ length: 5 }, (_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-5 w-5 ${
-                                i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-                              }`}
-                            />
-                          ))}
-                        </div>
+                      <StarRating rating={review.rating} size={20} />
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
