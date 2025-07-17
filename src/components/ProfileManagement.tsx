@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Download } from 'lucide-react'
+import { sampleReports } from '@/lib/data'
 
 const profileSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters."),
@@ -20,13 +21,6 @@ const profileSchema = z.object({
   bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
   medicalRecords: z.any().optional(),
 })
-
-const sampleReports = [
-  { id: "1", name: "Annual Physical Exam Results", date: "2023-10-15", doctor: "Dr. Anya Sharma" },
-  { id: "2", name: "Cardiology Stress Test Report", date: "2023-08-22", doctor: "Dr. Evelyn Reed" },
-  { id: "3", name: "Neurology Consultation Summary", date: "2023-05-01", doctor: "Dr. Marcus Thorne" },
-  { id: "4", name: "X-Ray Report - Left Knee", date: "2023-02-18", doctor: "Dr. James Carter" },
-];
 
 const ProfileManagement = () => {
   const { toast } = useToast()

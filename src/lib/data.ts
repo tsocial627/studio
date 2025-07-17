@@ -1,4 +1,4 @@
-import type { Doctor } from "@/lib/types";
+import type { Doctor, MedicalReport } from "@/lib/types";
 import { Bone, Brain, HeartPulse, Stethoscope } from "lucide-react";
 
 export const doctors: Doctor[] = [
@@ -43,4 +43,10 @@ export const doctors: Doctor[] = [
       icon: Bone,
     },
   ];
-  
+
+  export const sampleReports: MedicalReport[] = [
+    { id: "1", name: "Annual Physical Exam Results", date: "2023-10-15", doctor: "Dr. Anya Sharma" },
+    { id: "2", name: "Cardiology Stress Test Report", date: "2023-08-22", doctor: "Dr. Evelyn Reed" },
+    { id: "3", name: "Neurology Consultation Summary", date: "2023-05-01", doctor: "Dr. Marcus Thorne" },
+    { id: "4", name: "X-Ray Report - Left Knee", date: "2023-02-18", doctor: "Dr. James Carter" },
+  ];

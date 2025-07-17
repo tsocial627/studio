@@ -8,3 +8,10 @@ export type Doctor = {
   bio: string;
   icon?: React.ComponentType<{ className?: string }>;
 };
+
+export type MedicalReport = {
+  id: string;
+  name: string;
+  date: string;
+  doctor: string;
+};
