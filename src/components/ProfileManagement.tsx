@@ -9,6 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Download } from 'lucide-react'
 
 const profileSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters."),
@@ -19,16 +21,24 @@ const profileSchema = z.object({
   medicalRecords: z.any().optional(),
 })
 
+const sampleReports = [
+  { id: "1", name: "Annual Physical Exam Results", date: "2023-10-15", doctor: "Dr. Anya Sharma" },
+  { id: "2", name: "Cardiology Stress Test Report", date: "2023-08-22", doctor: "Dr. Evelyn Reed" },
+  { id: "3", name: "Neurology Consultation Summary", date: "2023-05-01", doctor: "Dr. Marcus Thorne" },
+  { id: "4", name: "X-Ray Report - Left Knee", date: "2023-02-18", doctor: "Dr. James Carter" },
+];
+
 const ProfileManagement = () => {
   const { toast } = useToast()
 
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: "",
-      address: "",
-      phone: "",
-      age: undefined,
+      fullName: "Alex Doe",
+      address: "123 Health St, Wellness City",
+      phone: "+11234567890",
+      age: 34,
+      bloodGroup: "O+",
     },
   })
 
@@ -39,6 +49,16 @@ const ProfileManagement = () => {
       description: "Your information has been saved successfully.",
     })
   }
+  
+  const handleDownload = (reportName: string) => {
+    toast({
+      title: "Downloading Report",
+      description: `${reportName} is being downloaded.`,
+    });
+    // In a real app, this would trigger a file download.
+    console.log(`Downloading ${reportName}`);
+  };
+
 
   return (
     <section id="profile" className="w-full py-12 md:py-24 lg:py-32 bg-secondary">
@@ -49,7 +69,7 @@ const ProfileManagement = () => {
             Keep your personal and medical information up to date for better care.
           </p>
         </div>
-        <div className="mx-auto max-w-2xl mt-8">
+        <div className="mx-auto grid max-w-4xl gap-8 mt-8 items-start">
           <Card className="shadow-lg">
             <CardHeader>
               <CardTitle>Your Information</CardTitle>
@@ -108,18 +128,53 @@ const ProfileManagement = () => {
                   </div>
                   <FormField control={form.control} name="medicalRecords" render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Upload Medical Records (Optional)</FormLabel>
+                        <FormLabel>Upload New Medical Record (Optional)</FormLabel>
                         <FormControl><Input type="file" {...form.register("medicalRecords")} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                 </CardContent>
                 <CardFooter>
-                  <Button type="submit" className="w-full">Save Profile</Button>
+                  <Button type="submit" className="w-full">Update Profile</Button>
                 </CardFooter>
               </form>
             </Form>
           </Card>
+
+           <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Your Reports</CardTitle>
+              <CardDescription>View and download your past medical reports.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Report Name</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Doctor</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sampleReports.map((report) => (
+                    <TableRow key={report.id}>
+                      <TableCell className="font-medium">{report.name}</TableCell>
+                      <TableCell>{report.date}</TableCell>
+                      <TableCell>{report.doctor}</TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" onClick={() => handleDownload(report.name)}>
+                          <Download className="h-4 w-4" />
+                          <span className="sr-only">Download</span>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
         </div>
       </div>
     </section>

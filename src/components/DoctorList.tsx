@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react"
@@ -5,9 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
-import { Star, Search, HeartPulse, Stethoscope, Brain, Bone } from "lucide-react"
+import { Star, Search, HeartPulse, Stethoscope, Brain, Bone, MessageSquare } from "lucide-react"
 import type { Doctor } from "@/lib/types"
 import { Button } from "./ui/button"
+import { useToast } from "@/hooks/use-toast"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
 
 const doctors: Doctor[] = [
   {
@@ -52,7 +56,7 @@ const doctors: Doctor[] = [
   },
 ];
 
-const StarRating = ({ rating }: { rating: number }) => (
+const StarRatingDisplay = ({ rating }: { rating: number }) => (
     <div className="flex items-center">
       {Array.from({ length: 5 }, (_, i) => (
         <Star
@@ -65,8 +69,88 @@ const StarRating = ({ rating }: { rating: number }) => (
     </div>
 );
 
+const FeedbackForm = ({ doctorName, onSubmit }: { doctorName: string; onSubmit: (feedback: { rating: number; comment: string }) => void }) => {
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const { toast } = useToast();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (rating === 0) {
+      toast({
+        variant: "destructive",
+        title: "Rating required",
+        description: "Please select a rating before submitting.",
+      });
+      return;
+    }
+    onSubmit({ rating, comment });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <p className="font-medium">Your rating for {doctorName}</p>
+        <div className="flex items-center">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <Star
+              key={star}
+              className={`h-6 w-6 cursor-pointer ${
+                star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+              }`}
+              onClick={() => setRating(star)}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="space-y-2">
+        <label htmlFor="comment" className="font-medium">Your feedback</label>
+        <Textarea
+          id="comment"
+          placeholder="Share your experience..."
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          rows={4}
+        />
+      </div>
+      <Button type="submit" className="w-full">Submit Feedback</Button>
+    </form>
+  );
+};
+
+
 const DoctorList = () => {
   const [searchTerm, setSearchTerm] = useState("")
+  const [bookedAppointments, setBookedAppointments] = useState<string[]>([])
+  const { toast } = useToast()
+
+  const handleAppointment = (doctorId: string, doctorName: string) => {
+    setBookedAppointments(prev => {
+      if (prev.includes(doctorId)) {
+        toast({
+          variant: "destructive",
+          title: "Appointment Cancelled",
+          description: `Your appointment with ${doctorName} has been cancelled.`,
+        })
+        return prev.filter(id => id !== doctorId)
+      } else {
+        toast({
+          title: "Appointment Booked!",
+          description: `Your appointment with ${doctorName} has been confirmed.`,
+        })
+        return [...prev, doctorId]
+      }
+    })
+  }
+
+  const handleFeedbackSubmit = (doctorName: string, feedback: { rating: number; comment: string }) => {
+    console.log(`Feedback for ${doctorName}:`, feedback);
+    toast({
+      title: "Feedback Submitted!",
+      description: `Thank you for your review of ${doctorName}.`,
+    });
+  };
+
   const filteredDoctors = doctors.filter(doctor =>
     doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase())
@@ -96,33 +180,63 @@ const DoctorList = () => {
         </div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {filteredDoctors.map(doctor => (
-                <Card key={doctor.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <CardHeader className="items-center text-center">
-                        <Image
-                            src={doctor.image}
-                            alt={`Dr. ${doctor.name}`}
-                            data-ai-hint="doctor portrait"
-                            width={80}
-                            height={80}
-                            className="rounded-full border-4 border-primary/20"
-                        />
-                        <CardTitle>{doctor.name}</CardTitle>
-                        <Badge variant="secondary" className="flex items-center gap-1.5">
-                            {doctor.icon && <doctor.icon className="h-4 w-4" />}
-                            {doctor.specialty}
-                        </Badge>
-                    </CardHeader>
-                    <CardContent className="text-center space-y-4">
-                        <div className="flex justify-center items-center gap-2">
-                           <StarRating rating={doctor.rating} />
-                           <span className="text-sm text-muted-foreground">({doctor.reviews} reviews)</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{doctor.bio}</p>
-                        <Button className="w-full">Book Appointment</Button>
-                    </CardContent>
-                </Card>
-            ))}
+            {filteredDoctors.map(doctor => {
+                const isBooked = bookedAppointments.includes(doctor.id);
+                return (
+                    <Card key={doctor.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                        <CardHeader className="items-center text-center">
+                            <Image
+                                src={doctor.image}
+                                alt={`Dr. ${doctor.name}`}
+                                data-ai-hint="doctor portrait"
+                                width={80}
+                                height={80}
+                                className="rounded-full border-4 border-primary/20"
+                            />
+                            <CardTitle>{doctor.name}</CardTitle>
+                            <Badge variant="secondary" className="flex items-center gap-1.5">
+                                {doctor.icon && <doctor.icon className="h-4 w-4" />}
+                                {doctor.specialty}
+                            </Badge>
+                        </CardHeader>
+                        <CardContent className="text-center space-y-4 flex-grow flex flex-col justify-between">
+                            <div>
+                                <div className="flex justify-center items-center gap-2">
+                                   <StarRatingDisplay rating={doctor.rating} />
+                                   <span className="text-sm text-muted-foreground">({doctor.reviews} reviews)</span>
+                                </div>
+                                <p className="text-sm text-muted-foreground mt-2">{doctor.bio}</p>
+                            </div>
+                            <div className="flex flex-col gap-2 mt-4">
+                                <Button 
+                                    className="w-full"
+                                    variant={isBooked ? 'destructive' : 'default'}
+                                    onClick={() => handleAppointment(doctor.id, doctor.name)}
+                                >
+                                    {isBooked ? 'Cancel Appointment' : 'Book Appointment'}
+                                </Button>
+                                 <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" className="w-full">
+                                            <MessageSquare className="mr-2 h-4 w-4"/>
+                                            Leave Feedback
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Leave Feedback</DialogTitle>
+                                        </DialogHeader>
+                                        <FeedbackForm 
+                                            doctorName={doctor.name} 
+                                            onSubmit={(feedback) => handleFeedbackSubmit(doctor.name, feedback)}
+                                        />
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )
+            })}
         </div>
         {filteredDoctors.length === 0 && (
             <p className="text-center text-muted-foreground mt-8">No doctors found matching your search.</p>

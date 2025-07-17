@@ -4,6 +4,7 @@ import SmartDoctorFinder from '@/components/SmartDoctorFinder';
 import DoctorList from '@/components/DoctorList';
 import ProfileManagement from '@/components/ProfileManagement';
 import Footer from '@/components/Footer';
+import ConsultationFeedback from '@/components/ConsultationFeedback';
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
         <Hero />
         <SmartDoctorFinder />
         <DoctorList />
+        <ConsultationFeedback />
         <ProfileManagement />
       </main>
       <Footer />
