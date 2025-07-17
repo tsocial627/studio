@@ -12,6 +12,7 @@ const fontBody = Inter({
 export const metadata: Metadata = {
   title: "MediLink",
   description: "Your Health, Your Schedule. Connect with top doctors and specialists from the comfort of your home.",
+  keywords: ["doctor appointment", "remote doctor access", "online healthcare", "virtual consultation", "medical specialist", "telemedicine"],
 };
 
 export default function RootLayout({
