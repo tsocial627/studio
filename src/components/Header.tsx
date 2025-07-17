@@ -48,10 +48,10 @@ const Header = () => {
   };
   
   const navLinks = [
-    { name: 'Find a Specialist', href: '#find-specialist' },
-    { name: 'Our Doctors', href: '#doctors' },
-    { name: 'Your Profile', href: '#profile' },
-    { name: 'Feedback', href: '#feedback' },
+    { name: 'Find a Specialist', href: '/#find-specialist' },
+    { name: 'Our Doctors', href: '/#doctors' },
+    { name: 'Your Profile', href: '/profile' },
+    { name: 'Feedback', href: '/#feedback' },
   ];
 
   return (
@@ -93,7 +93,7 @@ const Header = () => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href="#profile">
+                  <Link href="/profile">
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </Link>
