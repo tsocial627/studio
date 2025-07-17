@@ -7,6 +7,7 @@ interface StarRatingProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: number;
   fill?: boolean;
   onRate?: (rating: number) => void;
+  disabled?: boolean;
 }
 
 export function StarRating({
@@ -16,11 +17,13 @@ export function StarRating({
   fill = true,
   onRate,
   className,
+  disabled = false,
   ...props
 }: StarRatingProps) {
+  const isInteractive = onRate && !disabled;
   return (
     <div
-      className={cn("flex items-center gap-1", onRate && 'cursor-pointer', className)}
+      className={cn("flex items-center gap-1", isInteractive && 'cursor-pointer', disabled && 'opacity-50', className)}
       {...props}
     >
       {[...Array(totalStars)].map((_, i) => {
@@ -35,9 +38,9 @@ export function StarRating({
                 ? "text-yellow-400"
                 : "text-gray-300",
               fill && starValue <= rating && "fill-yellow-400",
-              onRate && "hover:text-yellow-300"
+              isInteractive && "hover:text-yellow-300"
             )}
-            onClick={() => onRate?.(starValue)}
+            onClick={() => isInteractive && onRate?.(starValue)}
           />
         );
       })}

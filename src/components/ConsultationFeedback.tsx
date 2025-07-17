@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { StarRating } from "./StarRating";
 import { doctors } from "@/lib/data";
+import { Loader2 } from "lucide-react";
 
 const feedbackSchema = z.object({
   doctor: z.string().min(1, "Please select a doctor."),
@@ -25,6 +26,7 @@ type SubmittedFeedback = z.infer<typeof feedbackSchema>;
 const ConsultationFeedback = () => {
   const { toast } = useToast();
   const [submittedReviews, setSubmittedReviews] = useState<SubmittedFeedback[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof feedbackSchema>>({
     resolver: zodResolver(feedbackSchema),
@@ -36,13 +38,37 @@ const ConsultationFeedback = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof feedbackSchema>) {
-    setSubmittedReviews((prev) => [...prev, values]);
-    toast({
-      title: "Feedback Submitted!",
-      description: "Thank you for sharing your experience.",
-    });
-    form.reset();
+  async function onSubmit(values: z.infer<typeof feedbackSchema>) {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          doctorName: values.doctor,
+          rating: values.rating,
+          comment: `Diagnosis: ${values.diagnosisFeedback} | Communication: ${values.communicationFeedback}`
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+      
+      setSubmittedReviews((prev) => [...prev, values]);
+      toast({
+        title: "Feedback Submitted!",
+        description: "Thank you for sharing your experience.",
+      });
+      form.reset();
+    } catch(error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      toast({
+        variant: "destructive",
+        title: "Submission Failed",
+        description: errorMessage,
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -70,7 +96,7 @@ const ConsultationFeedback = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Doctor</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select the doctor you consulted" />
@@ -99,7 +125,7 @@ const ConsultationFeedback = () => {
                            <Controller
                             name="rating"
                             control={form.control}
-                            render={({ field }) => <StarRating rating={field.value} onRate={field.onChange} size={24} />}
+                            render={({ field }) => <StarRating rating={field.value} onRate={field.onChange} size={24} disabled={loading}/>}
                           />
                         </FormControl>
                         <FormMessage />
@@ -114,7 +140,7 @@ const ConsultationFeedback = () => {
                       <FormItem>
                         <FormLabel>Diagnosis Effectiveness</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="How effective was the diagnosis?" {...field} />
+                          <Textarea placeholder="How effective was the diagnosis?" {...field} disabled={loading}/>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -128,7 +154,7 @@ const ConsultationFeedback = () => {
                       <FormItem>
                         <FormLabel>Communication</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="How was the doctor's communication?" {...field} />
+                          <Textarea placeholder="How was the doctor's communication?" {...field} disabled={loading}/>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -136,7 +162,10 @@ const ConsultationFeedback = () => {
                   />
                 </CardContent>
                 <CardFooter>
-                  <Button type="submit" className="w-full">Submit Review</Button>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Submit Review
+                  </Button>
                 </CardFooter>
               </form>
             </Form>

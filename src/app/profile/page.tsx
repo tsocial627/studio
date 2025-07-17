@@ -10,10 +10,11 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Download } from 'lucide-react'
+import { Download, Loader2 } from 'lucide-react'
 import { sampleReports } from '@/lib/data'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { useState } from 'react'
 
 const profileSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters."),
@@ -26,6 +27,7 @@ const profileSchema = z.object({
 
 export default function ProfilePage() {
   const { toast } = useToast()
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
@@ -38,12 +40,35 @@ export default function ProfilePage() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof profileSchema>) {
-    console.log(values)
-    toast({
-      title: "Profile Updated!",
-      description: "Your information has been saved successfully.",
-    })
+  async function onSubmit(values: z.infer<typeof profileSchema>) {
+    setLoading(true);
+    try {
+      // We remove medicalRecords from the body as we aren't handling file uploads here.
+      const { medicalRecords, ...profileData } = values;
+      const response = await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileData),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+
+      toast({
+        title: "Profile Updated!",
+        description: "Your information has been saved successfully.",
+      });
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: errorMessage,
+      });
+    } finally {
+      setLoading(false);
+    }
   }
   
   const handleDownload = (reportName: string) => {
@@ -83,14 +108,14 @@ export default function ProfilePage() {
                         <FormField control={form.control} name="fullName" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Full Name</FormLabel>
-                            <FormControl><Input placeholder="John Doe" {...field} /></FormControl>
+                            <FormControl><Input placeholder="John Doe" {...field} disabled={loading}/></FormControl>
                             <FormMessage />
                         </FormItem>
                         )} />
                         <FormField control={form.control} name="age" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Age</FormLabel>
-                            <FormControl><Input type="number" placeholder="30" {...field} /></FormControl>
+                            <FormControl><Input type="number" placeholder="30" {...field} disabled={loading}/></FormControl>
                             <FormMessage />
                         </FormItem>
                         )} />
@@ -98,7 +123,7 @@ export default function ProfilePage() {
                     <FormField control={form.control} name="address" render={({ field }) => (
                         <FormItem>
                         <FormLabel>Address</FormLabel>
-                        <FormControl><Input placeholder="123 Health St, Wellness City" {...field} /></FormControl>
+                        <FormControl><Input placeholder="123 Health St, Wellness City" {...field} disabled={loading}/></FormControl>
                         <FormMessage />
                         </FormItem>
                     )} />
@@ -106,14 +131,14 @@ export default function ProfilePage() {
                         <FormField control={form.control} name="phone" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Phone Number</FormLabel>
-                            <FormControl><Input placeholder="+1234567890" {...field} /></FormControl>
+                            <FormControl><Input placeholder="+1234567890" {...field} disabled={loading}/></FormControl>
                             <FormMessage />
                         </FormItem>
                         )} />
                         <FormField control={form.control} name="bloodGroup" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Blood Group</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
                             <FormControl><SelectTrigger><SelectValue placeholder="Select blood group" /></SelectTrigger></FormControl>
                             <SelectContent>
                                 {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(group => (
@@ -128,13 +153,16 @@ export default function ProfilePage() {
                     <FormField control={form.control} name="medicalRecords" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Upload New Medical Record (Optional)</FormLabel>
-                            <FormControl><Input type="file" {...form.register("medicalRecords")} /></FormControl>
+                            <FormControl><Input type="file" {...form.register("medicalRecords")} disabled={loading}/></FormControl>
                             <FormMessage />
                         </FormItem>
                         )} />
                     </CardContent>
                     <CardFooter>
-                    <Button type="submit" className="w-full">Update Profile</Button>
+                    <Button type="submit" className="w-full" disabled={loading}>
+                      {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Update Profile
+                    </Button>
                     </CardFooter>
                 </form>
                 </Form>

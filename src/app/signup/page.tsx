@@ -32,30 +32,31 @@ export default function SignUpPage() {
       return;
     }
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    // Basic validation
-    if (email && password) {
-       try {
+      const data = await response.json();
+
+      if (response.ok) {
         sessionStorage.setItem('user', JSON.stringify({ email }));
         toast({
-            title: 'Sign Up Successful',
-            description: 'Your account has been created.',
+          title: 'Sign Up Successful',
+          description: 'Your account has been created.',
         });
         router.push('/');
-       } catch (error) {
-         toast({
-            variant: 'destructive',
-            title: 'Sign Up Failed',
-            description: 'Could not save session. Please enable storage in your browser.',
-        });
-       }
-    } else {
+      } else {
+        throw new Error(data.message || 'Sign up failed');
+      }
+    } catch (error) {
+       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
        toast({
         variant: 'destructive',
         title: 'Sign Up Failed',
-        description: 'Please fill in all fields.',
+        description: errorMessage,
       });
     }
     
@@ -86,6 +87,7 @@ export default function SignUpPage() {
                 required 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
               />
             </div>
             <div className="space-y-2">
@@ -96,6 +98,7 @@ export default function SignUpPage() {
                 required 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
               />
             </div>
             <div className="space-y-2">
@@ -106,6 +109,7 @@ export default function SignUpPage() {
                 required 
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={loading}
               />
             </div>
           </CardContent>
