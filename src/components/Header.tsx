@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Menu, Hospital, User, LogOut } from 'lucide-react';
@@ -10,11 +10,13 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 
 const Header = () => {
   const isMobile = useIsMobile();
   const router = useRouter();
+  const pathname = usePathname();
   const { toast } = useToast();
   const [user, setUser] = useState<{ email: string } | null>(null);
 
@@ -65,7 +67,14 @@ const Header = () => {
         {!isMobile && (
           <nav className="hidden md:flex md:items-center md:gap-6 text-sm font-medium">
             {navLinks.map((link) => (
-              <Link key={link.name} href={link.href} className="transition-colors hover:text-foreground/80 text-foreground/60">
+              <Link 
+                key={link.name} 
+                href={link.href} 
+                className={cn(
+                  "transition-colors hover:text-foreground/80",
+                  pathname === link.href ? "text-foreground" : "text-foreground/60"
+                )}
+              >
                 {link.name}
               </Link>
             ))}
@@ -132,7 +141,13 @@ const Header = () => {
                 <nav className="grid gap-6 text-lg font-medium">
                   {navLinks.map((link) => (
                      <SheetClose asChild key={link.name}>
-                        <Link href={link.href} className="flex items-center space-x-2 transition-colors hover:text-foreground/80 text-foreground/60">
+                        <Link 
+                          href={link.href} 
+                          className={cn(
+                            "flex items-center space-x-2 transition-colors hover:text-foreground/80",
+                            pathname === link.href ? "text-foreground" : "text-foreground/60"
+                          )}
+                        >
                           <span>{link.name}</span>
                         </Link>
                      </SheetClose>
