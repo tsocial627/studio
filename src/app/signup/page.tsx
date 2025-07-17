@@ -6,7 +6,7 @@ import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {toast} from '@/hooks/use-toast';
+import {useToast} from '@/hooks/use-toast';
 import Link from 'next/link';
 import {Hospital, Loader2} from 'lucide-react';
 
@@ -36,11 +36,20 @@ export default function SignUpPage() {
 
     // Basic validation
     if (email && password) {
-      toast({
-        title: 'Sign Up Successful',
-        description: 'Your account has been created.',
-      });
-      router.push('/');
+       try {
+        sessionStorage.setItem('user', JSON.stringify({ email }));
+        toast({
+            title: 'Sign Up Successful',
+            description: 'Your account has been created.',
+        });
+        router.push('/');
+       } catch (error) {
+         toast({
+            variant: 'destructive',
+            title: 'Sign Up Failed',
+            description: 'Could not save session. Please enable storage in your browser.',
+        });
+       }
     } else {
        toast({
         variant: 'destructive',
