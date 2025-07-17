@@ -51,6 +51,7 @@ const Header = () => {
     { name: 'Find a Specialist', href: '#find-specialist' },
     { name: 'Our Doctors', href: '#doctors' },
     { name: 'Your Profile', href: '#profile' },
+    { name: 'Feedback', href: '#feedback' },
   ];
 
   return (
