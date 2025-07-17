@@ -21,7 +21,7 @@ This project is a frontend capstone project aimed at building a Medical Appointm
 2. Navigate into the project directory:
 
    ```
-   cd grihf-frontend_capstone_starter_code
+   cd studio
    ```
 3. Install dependencies:
 
